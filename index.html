@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="vt-version" content="vt-v2">
+<meta name="vt-version" content="vt-v2-1">
 <title>Validation Tool — Veris Coaching</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -279,10 +279,42 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 }
 
 /* ============================================================
-   Screen 1 — Teach (with Gordon diagram prologue)
+   Screen 1 — Teach (v2.1: numbered list → diagram → rule → paragraphs)
    ============================================================ */
+.s1-hero { margin-bottom: 56px; text-align: center; }
+.s1-hero .screen-title { margin-bottom: 20px; }
+
+/* v2.1 numbered list — Söhne 17px body + Freight italic 17px numerals */
+.s1-numbered {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 64px 0;
+  counter-reset: s1-num;
+}
+.s1-numbered li {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 20px;
+  font: 400 17px/1.6 var(--font-body);
+  color: var(--ink);
+  counter-increment: s1-num;
+}
+.s1-numbered li:last-child { margin-bottom: 0; }
+.s1-numbered li::before {
+  content: counter(s1-num) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font: 500 italic 17px/1.6 var(--font-display);
+  color: var(--ink-muted);
+}
+.s1-numbered li b {
+  font-weight: 600;
+}
+
+/* Gordon diagram (now sits mid-page, between numbered list and hairline rule) */
 .gordon-diagram {
-  margin: 0 0 56px 0;
+  margin: 0;
   text-align: center;
 }
 .gordon-diagram svg {
@@ -293,18 +325,37 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   height: auto;
 }
 .gordon-diagram .diagram-mobile { display: none; max-width: 320px; }
-.gordon-caption {
-  margin-top: 32px;
-  max-width: 560px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
+
+/* v2.1 hairline rule — 80px, ink-ghost @ 35%, centered */
+.s1-rule {
+  border: 0;
+  height: 1px;
+  width: 80px;
+  margin: 64px auto 48px;
+  background: var(--ink-ghost);
+  opacity: 0.35;
 }
+
+.s1-teaching { margin-bottom: 0; }
+.s1-teaching p { margin-bottom: 18px; }
+.s1-teaching p:last-child { margin-bottom: 0; }
+
+.s1-cta-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 56px;
+}
+
 @media (max-width: 640px) {
-  .gordon-diagram { margin-bottom: 40px; }
+  .s1-hero { margin-bottom: 40px; }
+  .s1-numbered { margin-bottom: 48px; }
+  .s1-numbered li { padding-left: 24px; margin-bottom: 16px; font-size: 16px; }
+  .s1-numbered li::before { font-size: 16px; }
   .gordon-diagram .diagram-desktop { display: none; }
   .gordon-diagram .diagram-mobile { display: block; }
-  .gordon-caption { margin-top: 24px; }
+  .s1-rule { margin: 48px auto 32px; }
+  .s1-teaching p { margin-bottom: 16px; }
+  .s1-cta-row { margin-top: 40px; }
 }
 
 /* Gordon diagram on-load motion (skipped if reduced motion) */
@@ -341,18 +392,6 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   .gordon-diagram.animate-in .ink-layer,
   .gordon-diagram.animate-in .bridge-arc,
   .gordon-diagram.animate-in .bridge-label { animation: none; }
-}
-
-.s1-hero { margin-bottom: 56px; text-align: center; }
-.s1-hero .screen-title { margin-bottom: 20px; }
-.s1-teaching { margin-bottom: 64px; }
-.s1-teaching p { margin-bottom: 14px; }
-.s1-teaching p:last-child { margin-bottom: 0; }
-
-.s1-cta-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 40px;
 }
 
 .s1-footnote, .s4-footnote {
@@ -534,7 +573,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 }
 
 /* ============================================================
-   Screen 4 — Prompt (single fixed forward question)
+   Screen 4 — Prompt (v2.1: two-slot dynamic forward question)
    ============================================================ */
 .s4-hero { margin-bottom: 56px; }
 .s4-hero .screen-title { margin-bottom: 16px; }
@@ -548,6 +587,18 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   .s4-question-block { padding: 36px 28px; }
 }
 .s4-question-block p { margin: 0; }
+
+/* S4 question slots inherit .slot styles but override line height for display-italic Freight */
+.s4-question .slot {
+  font-style: normal; /* preserve readability of slot content inside italic display container */
+  font-family: var(--font-body);
+  font-size: 22px;
+  white-space: nowrap; /* keep word + caret together when the question wraps */
+}
+@media (max-width: 640px) {
+  .s4-question .slot { font-size: 17px; }
+}
+
 .s4-alternate {
   font: 400 italic 17px/1.5 var(--font-body);
   color: var(--ink-muted);
@@ -732,12 +783,20 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 </div>
 
 <!-- =============================================================
-     SCREEN 1 — Teach
+     SCREEN 1 — Teach (v2.1: hero → list → diagram → rule → body → CTA)
      ============================================================= -->
 <section class="screen" id="screen1" aria-labelledby="s1-title">
   <div class="column">
 
-    <!-- Gordon diagram (Sable spec, two SVG siblings for responsive restructure) -->
+    <header class="s1-hero">
+      <h1 class="screen-title" id="s1-title"></h1>
+      <p class="anchor-line" id="s1-anchor"></p>
+    </header>
+
+    <!-- v2.1: Marlowe's three-step numbered list -->
+    <ol class="s1-numbered" id="s1-numbered"></ol>
+
+    <!-- v2.1: Gordon diagram MOVED here (between list and rule) -->
     <figure class="gordon-diagram" id="gordon-diagram">
 
       <svg class="diagram-desktop" viewBox="0 0 680 220" role="img"
@@ -747,86 +806,73 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
         <desc  id="gordon-desktop-desc">Three points connected along a horizontal line. The connection between the speaker's words and the listener's meaning is broken. A separate arc, labeled Validation, crosses the broken section.</desc>
 
         <g class="ink-layer">
-          <!-- Connecting rule: intent -> words (solid) -->
           <line x1="105" y1="110" x2="335" y2="110" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
-          <!-- Connecting rule: words -> listener (broken — segment A) -->
           <line x1="345" y1="110" x2="480" y2="110" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
-          <!-- Connecting rule: words -> listener (broken — segment B) -->
           <line x1="510" y1="110" x2="575" y2="110" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
 
-          <!-- Three nodes -->
           <circle cx="100" cy="110" r="5" fill="var(--ink)"/>
           <circle cx="340" cy="110" r="5" fill="var(--ink)"/>
           <circle cx="580" cy="110" r="5" fill="var(--ink)"/>
 
-          <!-- Plain labels -->
           <text x="100" y="148" text-anchor="middle" font-family="var(--font-body)" font-size="13" font-weight="500" fill="var(--ink)">What I mean</text>
           <text x="340" y="148" text-anchor="middle" font-family="var(--font-body)" font-size="13" font-weight="500" fill="var(--ink)">What I say</text>
           <text x="580" y="148" text-anchor="middle" font-family="var(--font-body)" font-size="13" font-weight="500" fill="var(--ink)">What you hear</text>
 
-          <!-- Italic technical labels -->
           <text x="100" y="166" text-anchor="middle" font-family="var(--font-body)" font-size="11" font-weight="400" font-style="italic" fill="var(--ink-ghost)">intent</text>
           <text x="340" y="166" text-anchor="middle" font-family="var(--font-body)" font-size="11" font-weight="400" font-style="italic" fill="var(--ink-ghost)">expression</text>
           <text x="580" y="166" text-anchor="middle" font-family="var(--font-body)" font-size="11" font-weight="400" font-style="italic" fill="var(--ink-ghost)">interpretation</text>
         </g>
 
-        <!-- Validation bridge arc (signal terracotta) -->
         <path class="bridge-arc" d="M 465 110 Q 495 80 525 110"
               stroke="var(--signal)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
 
-        <!-- Bridge label -->
         <text class="bridge-label" x="495" y="65" text-anchor="middle"
               font-family="var(--font-display)" font-size="14" font-weight="500" font-style="italic"
               letter-spacing="0.28" fill="var(--signal)">Validation</text>
       </svg>
 
-      <svg class="diagram-mobile" viewBox="0 0 320 380" role="img"
+      <!-- v2.1: mobile viewBox trimmed 380 → 320, geometry recomputed per Sable §5 -->
+      <svg class="diagram-mobile" viewBox="0 0 320 320" role="img"
            aria-labelledby="gordon-mobile-title gordon-mobile-desc"
            xmlns="http://www.w3.org/2000/svg">
         <title id="gordon-mobile-title">Diagram showing the gap between speaker intent and listener interpretation, with validation as the bridge across the gap.</title>
         <desc  id="gordon-mobile-desc">Three points stacked vertically. The connection between the speaker's words and the listener's meaning is broken. A separate arc, labeled Validation, crosses the broken section.</desc>
 
         <g class="ink-layer">
-          <!-- Vertical connecting rule: intent -> words (solid) -->
-          <line x1="160" y1="55" x2="160" y2="170" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
-          <!-- Vertical connecting rule: words -> listener (broken) — segment A then B -->
-          <line x1="160" y1="180" x2="160" y2="215" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
-          <line x1="160" y1="245" x2="160" y2="300" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
+          <!-- intent → words (solid): node1 (160,40) to node2 (160,160) -->
+          <line x1="160" y1="45" x2="160" y2="155" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
+          <!-- words → listener (broken): node2 (160,160) to break, then break to node3 (160,280) -->
+          <line x1="160" y1="165" x2="160" y2="200" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
+          <line x1="160" y1="230" x2="160" y2="275" stroke="var(--ink)" stroke-width="1" stroke-linecap="round"/>
 
-          <!-- Three nodes -->
-          <circle cx="160" cy="50" r="5" fill="var(--ink)"/>
-          <circle cx="160" cy="175" r="5" fill="var(--ink)"/>
-          <circle cx="160" cy="305" r="5" fill="var(--ink)"/>
+          <circle cx="160" cy="40" r="5" fill="var(--ink)"/>
+          <circle cx="160" cy="160" r="5" fill="var(--ink)"/>
+          <circle cx="160" cy="280" r="5" fill="var(--ink)"/>
 
-          <!-- Plain labels (right of node) -->
-          <text x="175" y="54" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What I mean</text>
-          <text x="175" y="179" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What I say</text>
-          <text x="175" y="309" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What you hear</text>
+          <text x="175" y="44" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What I mean</text>
+          <text x="175" y="164" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What I say</text>
+          <text x="175" y="284" text-anchor="start" font-family="var(--font-body)" font-size="12" font-weight="500" fill="var(--ink)">What you hear</text>
 
-          <!-- Italic technical labels -->
-          <text x="175" y="70" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">intent</text>
-          <text x="175" y="195" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">expression</text>
-          <text x="175" y="325" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">interpretation</text>
+          <text x="175" y="60" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">intent</text>
+          <text x="175" y="180" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">expression</text>
+          <text x="175" y="300" text-anchor="start" font-family="var(--font-body)" font-size="10" font-weight="400" font-style="italic" fill="var(--ink-ghost)">interpretation</text>
         </g>
 
-        <!-- Validation bridge arc (curves out to the right) -->
-        <path class="bridge-arc" d="M 160 215 Q 200 230 160 245"
+        <!-- v2.1: bridge arc on tighter geometry (200/215/230 per Sable §5) -->
+        <path class="bridge-arc" d="M 160 200 Q 200 215 160 230"
               stroke="var(--signal)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
 
-        <!-- Bridge label -->
-        <text class="bridge-label" x="215" y="234" text-anchor="start"
+        <text class="bridge-label" x="215" y="219" text-anchor="start"
               font-family="var(--font-display)" font-size="14" font-weight="500" font-style="italic"
               letter-spacing="0.28" fill="var(--signal)">Validation</text>
       </svg>
 
-      <figcaption class="gordon-caption body" id="s1-gordon-caption"></figcaption>
     </figure>
 
-    <header class="s1-hero">
-      <h1 class="screen-title" id="s1-title"></h1>
-      <p class="anchor-line" id="s1-anchor"></p>
-    </header>
+    <!-- v2.1: hairline rule, 80px, ink-ghost @ 35%, centered -->
+    <hr class="s1-rule" aria-hidden="true">
 
+    <!-- v2.1: body paragraphs (Gordon explanation merged from retired figcaption) -->
     <div class="s1-teaching body" id="s1-body"></div>
 
     <div class="s1-cta-row">
@@ -838,7 +884,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 </section>
 
 <!-- =============================================================
-     SCREEN 2 — Pick
+     SCREEN 2 — Pick (UNCHANGED from v2)
      ============================================================= -->
 <section class="screen" id="screen2" aria-labelledby="s2-title">
   <div class="column">
@@ -869,7 +915,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 </section>
 
 <!-- =============================================================
-     SCREEN 3 — Frame
+     SCREEN 3 — Frame (UNCHANGED from v2)
      ============================================================= -->
 <section class="screen" id="screen3" aria-labelledby="s3-title">
   <div class="column">
@@ -908,7 +954,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 </section>
 
 <!-- =============================================================
-     SCREEN 4 — Prompt
+     SCREEN 4 — Prompt (v2.1: dynamic two-slot question)
      ============================================================= -->
 <section class="screen" id="screen4" aria-labelledby="s4-title">
   <div class="column">
@@ -990,7 +1036,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   'use strict';
 
   // ==========================================================
-  // CONTENT (Marlowe v2 lock 2026-04-27)
+  // CONTENT (Marlowe v2.1 patch 2026-04-27)
   // ==========================================================
   var CONTENT = {
     emotions: [
@@ -1003,6 +1049,28 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       { id: 'trapped',      word: 'Trapped',      desc: 'Like they have less room than they need to be themselves' },
       { id: 'disrespected', word: 'Disrespected', desc: "Like they're not being taken seriously" }
     ],
+    // v2.1: positives[] RESTORED — un-retired from v1 per Marlowe Patch 1
+    positives: [
+      { id: 'seen',           word: 'seen' },
+      { id: 'met',            word: 'met' },
+      { id: 'trusted',        word: 'trusted' },
+      { id: 'steady',         word: 'steady' },
+      { id: 'known',          word: 'known' },
+      { id: 'valued',         word: 'valued' },
+      { id: 'on-solid-ground', word: 'on solid ground' },
+      { id: 'at-ease',        word: 'at ease' }
+    ],
+    // v2.1: pairing map per Marlowe table — emotion id → recommended positive id
+    pairings: {
+      'unseen':       'seen',
+      'too-much':     'at-ease',
+      'managed':      'trusted',
+      'alone':        'met',
+      'exhausted':    'steady',
+      'not-enough':   'valued',
+      'trapped':      'on-solid-ground',
+      'disrespected': 'valued'
+    },
     frictions: {
       couples: [
         { id: 'money',        text: 'The same fight about money or how we spend' },
@@ -1028,13 +1096,23 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     copy: {
       s1: {
         title: "Most arguments aren’t disagreements. They’re two people having different conversations.",
-        anchor: "The fastest way to get to the same conversation is to name what the other person is experiencing — out loud, accurately, before you say anything else.",
-        body: [
-          "You know the rhythm. You say something. They respond to something else. They say something. You respond to something else. By minute three, you’re both right — about completely different fights. Most disagreements don’t fail because the two of you want different things. They fail because you never confirmed you were arguing about the same thing in the first place.",
-          "There’s a move that closes that gap, and almost no one makes it. It’s called validation — what therapists call accurate empathy — and it’s simple to describe and harder than it looks: before you respond, you name the other person’s experience back to them. Their emotion. The situation as they see it. Out loud. And you check whether you got it right. Not “I feel hurt when you do that.” Not “I think what you mean is.” This is naming their side of the table — accurately enough that they recognize themselves in your words.",
-          "This tool walks you through one validation, end to end. You’ll think about a partnership where the same conversation keeps not happening. You’ll name the emotion you think the other person is feeling, and the situation as they likely see it. Then you’ll build a single sentence — one you can carry into the next hard conversation — that names their experience back to them and asks whether you got it right. Takes about five minutes. Works better if you do it before the next argument, not during."
+        // v2.1 anchor — Marlowe Patch 4 (foreshadow three-step structure)
+        anchor: "The fastest way to get to the same conversation is to name what the other person is experiencing — accurately, out loud, and check that you got it right.",
+        // v2.1 paragraph 1 — trimmed (Patch 3)
+        bodyP1: "You know the rhythm. You say something. They respond to something else. By minute three, you’re both right — about completely different fights. Most disagreements don’t fail because you want different things. They fail because you never confirmed you were arguing about the same thing.",
+        // v2.1 numbered list intro line — Marlowe Patch 2
+        listIntro: "There’s a move that closes that gap, and almost no one makes it. It’s called validation — what therapists call <em>accurate empathy</em> — and it’s three steps:",
+        // v2.1 three-step list (HTML allowed for <b> lead phrases)
+        listItems: [
+          "<b>Name the emotion you think they’re feeling.</b> Their emotion, not yours.",
+          "<b>Describe the situation as they see it.</b> From their side of the table, in language close to how they’d describe it.",
+          "<b>Ask if you got it right.</b> Out loud. Wait for the answer."
         ],
-        gordonCaption: "Thomas Gordon, a clinical psychologist who studied how communication breaks down between parents, partners, and colleagues, mapped what’s actually happening in a stuck conversation. Three steps: the speaker has an intent (what they meant). The intent gets translated into words (what they actually said, which is never the whole intent). The listener turns those words into a meaning (which is filtered through their own assumptions). The further the listener’s meaning drifts from the speaker’s intent, the worse the next round goes. Validation is the bridge. When you name the other person’s experience back to them — accurately — you close the gap before the assumed meaning becomes the next argument."
+        listCloser: "That’s it. Three steps. The reason almost no one does it is that doing it well requires you to set down your own version of the conversation long enough to actually take a real shot at theirs.",
+        // v2.1 paragraph 3 — trimmed Gordon explanation (was figcaption in v2, now joins body)
+        bodyP3: "Thomas Gordon, a clinical psychologist who studied how stuck conversations stay stuck, mapped three steps. The speaker has an intent (what they meant). The intent becomes words (which never carry the whole intent). The listener turns the words into a meaning (filtered through their own assumptions). The further the meaning drifts from the intent, the worse the next round goes. Validation is the bridge — name the other person’s experience back to them, accurately, before the assumed meaning becomes the next argument.",
+        // v2.1 paragraph 4 — trimmed (Patch 3)
+        bodyP4: "This tool walks you through one validation. Pick a partnership where the same conversation keeps not happening. Name the emotion you think they’re feeling and the situation as they likely see it. Build one sentence you can carry into the next hard conversation. Takes about five minutes. Works better if you do it before the next argument, not during."
       },
       s2: {
         title: "Now think about them — not you.",
@@ -1054,9 +1132,10 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       },
       s4: {
         title: "One more question — for them, before next time.",
-        anchor: "This is the question that keeps the bridge open between conversations. Ask it when you’re not in the middle of the friction. Wait for what they say.",
-        question: "When this comes up next, what would help me understand your side of it better?",
-        alternate: "Or, if you want it sharper: “What’s the part of this I keep missing from where you sit?”",
+        // v2.1 anchor — Marlowe Patch 1
+        anchor: "This is the question that keeps the bridge open between conversations. Two specific words, in their language, about what they’re carrying. Ask it when you’re not in the middle of the friction. Wait for what they say.",
+        // v2.1 alternate — v2's primary becomes v2.1's alternate
+        alternate: "Or sharper, if you want their words: “What’s the part of this I keep missing from where you sit?”",
         instrCouples: "Ask your partner when things are calm. Don’t answer for them. Don’t defend the way you’ve understood them so far. Just listen and write down what they say.",
         instrBusiness: "Ask your business partner when things are calm. Don’t answer for them. Don’t defend the way you’ve understood them so far. Just listen and write down what they say.",
         closing: [
@@ -1079,7 +1158,8 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   // ==========================================================
   // STATE
   // ==========================================================
-  var STORAGE_KEY = 'validation-tool-state-v2';
+  // v2.1 key bump — adds primaryMore + moreEditText fields. v2 state quarantined.
+  var STORAGE_KEY = 'validation-tool-state-v2-1';
   var state = loadState() || {
     mode: readModeFromQuery(),
     screen: 1,
@@ -1087,14 +1167,18 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     selectedFrictions: [],
     primaryEmotion: null,
     primaryFriction: null,
-    frictionEditText: null
+    primaryMore: null,        // v2.1 — id from positives[]
+    frictionEditText: null,
+    moreEditText: null        // v2.1 — user-edited override for MORE slot
   };
 
+  // v2.1: mode default FLIPPED to business. ?mode=couples → couples. ?mode=business or no-param → business.
   function readModeFromQuery() {
     try {
       var p = new URLSearchParams(window.location.search);
-      return p.get('mode') === 'business' ? 'business' : 'couples';
-    } catch (e) { return 'couples'; }
+      var v = p.get('mode');
+      return v === 'couples' ? 'couples' : 'business';
+    } catch (e) { return 'business'; }
   }
 
   function saveState() {
@@ -1106,7 +1190,11 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       if (!raw) return null;
       var s = JSON.parse(raw);
       var urlMode = readModeFromQuery();
+      // URL mode takes precedence on load (matches v2 behavior)
       if (urlMode && urlMode !== s.mode) s.mode = urlMode;
+      // Defensive defaults for any v2.1 fields missing in older serialized state
+      if (typeof s.primaryMore === 'undefined') s.primaryMore = null;
+      if (typeof s.moreEditText === 'undefined') s.moreEditText = null;
       return s;
     } catch (e) { return null; }
   }
@@ -1127,11 +1215,14 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 
     document.getElementById('s1-title').textContent = c.s1.title;
     document.getElementById('s1-anchor').textContent = c.s1.anchor;
-    document.getElementById('s1-gordon-caption').textContent = c.s1.gordonCaption;
 
+    // v2.1: numbered list — intro + 3 items + closer rendered into <ol> + adjacent paragraphs
+    renderS1Numbered();
+
+    // v2.1: body paragraphs after the diagram + rule
     var bodyEl = document.getElementById('s1-body');
     bodyEl.innerHTML = '';
-    c.s1.body.forEach(function(p) {
+    [c.s1.bodyP3, c.s1.bodyP4].forEach(function(p) {
       var el = document.createElement('p');
       el.textContent = p;
       bodyEl.appendChild(el);
@@ -1154,7 +1245,6 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 
     document.getElementById('s4-title').textContent = c.s4.title;
     document.getElementById('s4-anchor').textContent = c.s4.anchor;
-    document.getElementById('s4-question').textContent = '“' + c.s4.question + '”';
     document.getElementById('s4-alternate').textContent = c.s4.alternate;
     document.getElementById('s4-instruction').textContent =
       m === 'business' ? c.s4.instrBusiness : c.s4.instrCouples;
@@ -1175,6 +1265,65 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       if (b.getAttribute('data-mode') === m) b.classList.add('active');
       else b.classList.remove('active');
     });
+  }
+
+  // v2.1: render S1 numbered list block.
+  // The intro line + closer wrap the <ol>. We inject the intro as the first paragraph of body
+  // ABOVE the list, and the closer as a paragraph BELOW the list. To stay within Sable's
+  // markup contract (hero → ol → diagram → rule → body), we put intro+closer immediately
+  // around the ol by inserting them before/after the ol element.
+  function renderS1Numbered() {
+    var ol = document.getElementById('s1-numbered');
+    if (!ol) return;
+    // Wipe any siblings injected earlier (intro p, closer p, hero p1 paragraph)
+    var prev = ol.previousElementSibling;
+    while (prev && (prev.classList && (prev.classList.contains('s1-list-intro') || prev.classList.contains('s1-bodyP1')))) {
+      var x = prev;
+      prev = prev.previousElementSibling;
+      x.parentNode.removeChild(x);
+    }
+    var next = ol.nextElementSibling;
+    if (next && next.classList && next.classList.contains('s1-list-closer')) {
+      next.parentNode.removeChild(next);
+    }
+
+    var c = CONTENT.copy.s1;
+
+    // Inject paragraph 1 (the "you know the rhythm" insight) immediately before the list,
+    // after the hero header. That keeps Sable's stack: hero → list-intro+ol+list-closer → diagram.
+    var p1 = document.createElement('p');
+    p1.className = 'body s1-bodyP1';
+    p1.style.marginBottom = '24px';
+    p1.textContent = c.bodyP1;
+    ol.parentNode.insertBefore(p1, ol);
+
+    // List intro line — rendered as paragraph immediately above the <ol>.
+    var intro = document.createElement('p');
+    intro.className = 'body s1-list-intro';
+    intro.style.marginBottom = '20px';
+    // Allow <em> tag in intro
+    intro.innerHTML = c.listIntro;
+    ol.parentNode.insertBefore(intro, ol);
+
+    // Items
+    ol.innerHTML = '';
+    c.listItems.forEach(function(item) {
+      var li = document.createElement('li');
+      li.innerHTML = item;
+      ol.appendChild(li);
+    });
+
+    // List closer — rendered as paragraph immediately below the <ol>, before the diagram.
+    var closer = document.createElement('p');
+    closer.className = 'body s1-list-closer';
+    closer.style.marginTop = '20px';
+    closer.style.marginBottom = '0';
+    closer.textContent = c.listCloser;
+    if (ol.nextSibling) {
+      ol.parentNode.insertBefore(closer, ol.nextSibling);
+    } else {
+      ol.parentNode.appendChild(closer);
+    }
   }
 
   // ==========================================================
@@ -1225,7 +1374,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   // ==========================================================
-  // SCREEN 2 — Pick
+  // SCREEN 2 — Pick (UNCHANGED from v2)
   // ==========================================================
   function renderScreen2() {
     renderEmotionGrid();
@@ -1383,7 +1532,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   // ==========================================================
-  // SCREEN 3 — Frame (three-line composer)
+  // SCREEN 3 — Frame (three-line composer) (UNCHANGED from v2)
   // ==========================================================
   function renderScreen3() {
     if (!state.primaryEmotion ||
@@ -1396,23 +1545,18 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     }
     saveState();
 
-    // Line 1: I hear you're feeling [EMOTION].
     var line1 = document.getElementById('s3-line-emotion');
     line1.innerHTML = '';
     appendText(line1, '“I hear you’re feeling ');
-    line1.appendChild(buildEmotionSlot());
+    line1.appendChild(buildEmotionSlot('s3'));
     appendText(line1, '.');
 
-    // Line 2: From your side, [SITUATION].
     var line2 = document.getElementById('s3-line-situation');
     line2.innerHTML = '';
     appendText(line2, 'From your side, ');
-    line2.appendChild(buildFrictionSlot());
+    line2.appendChild(buildFrictionSlot('s3'));
     appendText(line2, '.');
 
-    // Line 3 is fixed in markup ("Did I get that right?")
-
-    // Alternates — both with check-ins (Marlowe v2)
     var emoWord = getPrimaryEmotionWord();
     var fricText = getPrimaryFrictionText();
     document.getElementById('s3-alt-simple').textContent =
@@ -1435,7 +1579,29 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     return sel ? sel.text : '___';
   }
 
-  function buildEmotionSlot() {
+  // v2.1: MORE slot value resolution.
+  // Priority: user edit override → primaryMore from state → smart default from pairings table → first positive.
+  function getPrimaryMoreWord() {
+    if (state.moreEditText != null) {
+      return state.moreEditText;
+    }
+    if (state.primaryMore) {
+      var p = CONTENT.positives.find(function(x){ return x.id === state.primaryMore; });
+      if (p) return p.word;
+    }
+    // Smart default from pairings table based on current emotion
+    var emoSel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
+    if (emoSel) {
+      var pairId = CONTENT.pairings[emoSel.id];
+      if (pairId) {
+        var paired = CONTENT.positives.find(function(x){ return x.id === pairId; });
+        if (paired) return paired.word;
+      }
+    }
+    return CONTENT.positives[0].word;
+  }
+
+  function buildEmotionSlot(screen) {
     var wrap = document.createElement('span');
     wrap.className = 'slot';
     wrap.setAttribute('role', 'button');
@@ -1454,27 +1620,28 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       picker.textContent = '▾';
       picker.addEventListener('click', function(e) {
         e.stopPropagation();
-        cycleEmotion();
+        cycleEmotion(screen);
       });
       wrap.appendChild(picker);
     }
 
-    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'emotion'); });
+    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'emotion', screen); });
     wrap.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'emotion'); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'emotion', screen); }
     });
     return wrap;
   }
 
-  function cycleEmotion() {
+  function cycleEmotion(screen) {
     var idx = state.selectedEmotions.findIndex(function(e){ return e.id === state.primaryEmotion; });
     var next = (idx + 1) % state.selectedEmotions.length;
     state.primaryEmotion = state.selectedEmotions[next].id;
     saveState();
-    renderScreen3();
+    if (screen === 's4') renderScreen4();
+    else renderScreen3();
   }
 
-  function buildFrictionSlot() {
+  function buildFrictionSlot(screen) {
     var wrap = document.createElement('span');
     wrap.className = 'slot';
     wrap.setAttribute('role', 'button');
@@ -1492,58 +1659,116 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       picker.textContent = '▾';
       picker.addEventListener('click', function(e) {
         e.stopPropagation();
-        cycleFriction();
+        cycleFriction(screen);
       });
       wrap.appendChild(picker);
     }
 
-    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'friction'); });
+    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'friction', screen); });
     wrap.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'friction'); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'friction', screen); }
     });
     return wrap;
   }
 
-  function cycleFriction() {
+  function cycleFriction(screen) {
     var idx = state.selectedFrictions.findIndex(function(f){ return f.id === state.primaryFriction; });
     var next = (idx + 1) % state.selectedFrictions.length;
     state.primaryFriction = state.selectedFrictions[next].id;
     state.frictionEditText = null;
     saveState();
-    renderScreen3();
+    if (screen === 's4') renderScreen4();
+    else renderScreen3();
   }
 
-  function enterSlotEdit(wrapEl, kind) {
+  // v2.1: MORE slot — cycle through 8-word vocabulary (always available — no multi-select gating).
+  function buildMoreSlot() {
+    var wrap = document.createElement('span');
+    wrap.className = 'slot';
+    wrap.setAttribute('role', 'button');
+    wrap.setAttribute('tabindex', '0');
+    wrap.setAttribute('aria-label', 'Choose or edit the more-word');
+    var text = document.createElement('span');
+    text.textContent = getPrimaryMoreWord();
+    wrap.appendChild(text);
+
+    var picker = document.createElement('button');
+    picker.type = 'button';
+    picker.className = 'slot-picker-btn';
+    picker.setAttribute('aria-label', 'Switch more-word');
+    picker.textContent = '▾';
+    picker.addEventListener('click', function(e) {
+      e.stopPropagation();
+      cycleMore();
+    });
+    wrap.appendChild(picker);
+
+    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'more', 's4'); });
+    wrap.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'more', 's4'); }
+    });
+    return wrap;
+  }
+
+  function cycleMore() {
+    // If primaryMore not yet set, seed from current visible word (smart default)
+    if (!state.primaryMore) {
+      var current = getPrimaryMoreWord();
+      var match = CONTENT.positives.find(function(p){ return p.word === current; });
+      state.primaryMore = match ? match.id : CONTENT.positives[0].id;
+    }
+    var idx = CONTENT.positives.findIndex(function(p){ return p.id === state.primaryMore; });
+    var next = (idx + 1) % CONTENT.positives.length;
+    state.primaryMore = CONTENT.positives[next].id;
+    state.moreEditText = null;
+    saveState();
+    renderScreen4();
+  }
+
+  function enterSlotEdit(wrapEl, kind, screen) {
     if (wrapEl.querySelector('input.slot-input')) return;
-    var current = kind === 'emotion' ? getPrimaryEmotionWord() : getPrimaryFrictionText();
+    var current;
+    if (kind === 'emotion') current = getPrimaryEmotionWord();
+    else if (kind === 'friction') current = getPrimaryFrictionText();
+    else if (kind === 'more') current = getPrimaryMoreWord();
     wrapEl.innerHTML = '';
     var input = document.createElement('input');
     input.type = 'text';
     input.className = 'slot-input';
     input.value = current;
-    input.setAttribute('aria-label', kind === 'emotion' ? 'Edit emotion' : 'Edit friction');
+    input.setAttribute('aria-label',
+      kind === 'emotion' ? 'Edit emotion'
+      : kind === 'friction' ? 'Edit friction'
+      : 'Edit more-word');
     wrapEl.appendChild(input);
     input.style.width = Math.max(80, Math.min(600, current.length * 12)) + 'px';
     input.focus();
     input.select();
+
+    var rerender = function() {
+      if (screen === 's4') renderScreen4();
+      else renderScreen3();
+    };
 
     var commit = function() {
       var v = (input.value || '').trim();
       if (kind === 'emotion') {
         var sel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
         if (sel && v) sel.word = v;
-      } else {
+      } else if (kind === 'friction') {
         if (v) state.frictionEditText = v;
+      } else if (kind === 'more') {
+        if (v) state.moreEditText = v;
       }
       saveState();
-      renderScreen3();
+      rerender();
     };
     input.addEventListener('blur', commit);
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
       else if (e.key === 'Escape') {
         input.removeEventListener('blur', commit);
-        renderScreen3();
+        rerender();
       }
       e.stopPropagation();
     });
@@ -1553,11 +1778,24 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   // ==========================================================
-  // SCREEN 4 — Prompt (single fixed forward question, no slots)
+  // SCREEN 4 — Prompt (v2.1: dynamic two-slot forward question)
   // ==========================================================
   function renderScreen4() {
-    // Question + alternate text are static — already populated in applyCopyForMode.
-    // Nothing dynamic to render here in v2.
+    // Ensure primaryEmotion exists (mirror s3 fallback)
+    if (!state.primaryEmotion ||
+        !state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; })) {
+      state.primaryEmotion = state.selectedEmotions.length ? state.selectedEmotions[0].id : null;
+    }
+    saveState();
+
+    var q = document.getElementById('s4-question');
+    q.innerHTML = '';
+    // Build: “What would make you feel less [LESS] and more [MORE]?”
+    appendText(q, '“What would make you feel less ');
+    q.appendChild(buildEmotionSlot('s4'));
+    appendText(q, ' and more ');
+    q.appendChild(buildMoreSlot());
+    appendText(q, '?”');
   }
 
   // ==========================================================
@@ -1566,6 +1804,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   function renderPrintCard() {
     var emoWord = getPrimaryEmotionWord();
     var fricText = getPrimaryFrictionText();
+    var moreWord = getPrimaryMoreWord();
     var today = new Date();
     var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var dateStr = 'Rehearsed ' + months[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear() + '.';
@@ -1575,14 +1814,16 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 
     document.getElementById('pc-line-emotion').textContent = '“I hear you’re feeling ' + emoWord + '.';
     document.getElementById('pc-line-situation').textContent = 'From your side, ' + fricText + '.';
-    // Line 3 ("Did I get that right?”") is fixed in markup, with the closing quote.
 
     document.getElementById('pc-alt-simple').textContent =
       '“I hear you’re feeling ' + emoWord + '. Did I get that right?”';
     document.getElementById('pc-alt-tentative').textContent =
       '“It sounds like, from your side, ' + fricText + ' — and you might be feeling ' + emoWord + '. Is that close?”';
+
+    // v2.1: pocket card forward question — dynamic two-slot per Marlowe Patch 1
     document.getElementById('pc-question').textContent =
-      '“' + CONTENT.copy.s4.question + '”';
+      '“What would make you feel less ' + emoWord + ' and more ' + moreWord + '?”';
+
     document.getElementById('pc-footnote').textContent = CONTENT.footnotes[state.mode];
     document.getElementById('pc-url').textContent = 'scottmcbean.github.io/validation-tool';
   }
@@ -1593,11 +1834,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   function bootGordonDiagram() {
     var fig = document.getElementById('gordon-diagram');
     if (!fig) return;
-    if (prefersReducedMotion()) {
-      // Skip animation; let the static fallback CSS render the diagram in final state.
-      return;
-    }
-    // Defer to next frame so transition-from-zero state is visible.
+    if (prefersReducedMotion()) return;
     requestAnimationFrame(function() {
       fig.classList.add('animate-in');
     });
@@ -1614,7 +1851,8 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
         state.mode = m;
         try {
           var url = new URL(window.location.href);
-          if (m === 'business') url.searchParams.set('mode', 'business');
+          // v2.1: business is default — emit ?mode=couples for couples, scrub param for business.
+          if (m === 'couples') url.searchParams.set('mode', 'couples');
           else url.searchParams.delete('mode');
           window.history.replaceState({}, '', url.toString());
         } catch (e) {}
@@ -1652,7 +1890,9 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
         selectedFrictions: [],
         primaryEmotion: null,
         primaryFriction: null,
-        frictionEditText: null
+        primaryMore: null,
+        frictionEditText: null,
+        moreEditText: null
       };
       saveState();
       applyCopyForMode();
