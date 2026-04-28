@@ -90,6 +90,14 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   outline-offset: 2px;
   border-radius: 2px;
 }
+/* v2.2.1: Chips have no focus outline. Selection feedback is the
+   .chip.selected state (ink border thickening + ink dot top-right).
+   Keyboard users press Enter/Space → click handler fires → selection
+   visually confirms the action. The previous 1px ghost outline still
+   read as visual noise on click; full removal is cleaner. CTA buttons,
+   back buttons, and other interactive elements keep the global signal
+   focus ring for a11y. */
+.chip:focus-visible { outline: none; }
 
 /* ============================================================
    Page frame
@@ -448,22 +456,9 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 }
 .chip .chip-word { display: block; margin-bottom: 4px; }
 .chip .chip-desc { display: block; }
-.chip .chip-word-input {
-  display: block;
-  width: 100%;
-  font: 600 19px/1.3 var(--font-body);
-  color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 1px dashed var(--ink-ghost);
-  outline: none;
-  padding: 0 0 2px 0;
-  margin-bottom: 4px;
-  font-family: inherit;
-}
+/* v2.2.1: .chip-word-input styles removed — inline-edit affordance retired. */
 @media (max-width: 640px) {
   .chip { padding: 12px 16px; }
-  .chip .chip-word-input { font-size: 18px; }
 }
 
 /* ============================================================
@@ -1433,50 +1428,22 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   function handleEmotionChipClick(id, btnEl) {
-    if (btnEl.querySelector('.chip-word-input')) return;
-    var existing = state.selectedEmotions.find(function(s){ return s.id === id; });
-    if (!existing) {
-      var emo = CONTENT.emotions.find(function(e){ return e.id === id; });
-      state.selectedEmotions.push({ id: emo.id, word: emo.word, desc: emo.desc });
-      saveState();
-      renderEmotionGrid();
-      updateS2Cta();
-    } else {
-      enterEmotionEditState(id, btnEl);
-    }
+    // v2.2.1: single-select with auto-switch (B replaces A).
+    // Clicking the already-selected chip is a no-op (no edit, no deselect).
+    // Clicking a different chip replaces the prior selection.
+    var alreadySelected = state.selectedEmotions.length > 0 && state.selectedEmotions[0].id === id;
+    if (alreadySelected) return;
+    var emo = CONTENT.emotions.find(function(e){ return e.id === id; });
+    if (!emo) return;
+    state.selectedEmotions = [{ id: emo.id, word: emo.word, desc: emo.desc }];
+    state.primaryEmotion = emo.id;
+    saveState();
+    renderEmotionGrid();
+    updateS2Cta();
   }
 
-  function enterEmotionEditState(id, btnEl) {
-    var sel = state.selectedEmotions.find(function(s){ return s.id === id; });
-    if (!sel) return;
-    var wordEl = btnEl.querySelector('.chip-word');
-    if (!wordEl) return;
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'chip-word-input';
-    input.value = sel.word;
-    input.setAttribute('aria-label', 'Edit emotion word');
-    wordEl.replaceWith(input);
-    input.focus();
-    input.select();
-    var commit = function() {
-      var v = (input.value || '').trim();
-      if (v) sel.word = v;
-      else state.selectedEmotions = state.selectedEmotions.filter(function(s){ return s.id !== id; });
-      saveState();
-      renderEmotionGrid();
-      updateS2Cta();
-    };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-      else if (e.key === 'Escape') {
-        input.removeEventListener('blur', commit);
-        renderEmotionGrid();
-      }
-      e.stopPropagation();
-    });
-  }
+  // v2.2.1: enterEmotionEditState removed — single-select + no inline edit.
+  // Click on selected chip is now a no-op (see handleEmotionChipClick).
 
   function renderFrictionGrid() {
     var grid = document.getElementById('frictionGrid');
@@ -1504,63 +1471,30 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   function handleFrictionChipClick(id, btnEl) {
-    if (btnEl.querySelector('.chip-word-input')) return;
-    var existing = state.selectedFrictions.find(function(s){ return s.id === id; });
-    if (!existing) {
-      var fr = CONTENT.frictions[state.mode].find(function(e){ return e.id === id; });
-      // v2.2: capture chip_text (menu/edit display), reflection_text (rendered in S3 wrapper),
-      // and template (T2 or T3). Edits to text override both display and reflection paths.
-      state.selectedFrictions.push({
-        id: fr.id,
-        text: fr.chip_text,
-        reflection_text: fr.reflection_text,
-        template: fr.template
-      });
-      saveState();
-      renderFrictionGrid();
-      updateS2Cta();
-    } else {
-      enterFrictionEditState(id, btnEl);
-    }
+    // v2.2.1: single-select with auto-switch (B replaces A).
+    // Clicking the already-selected chip is a no-op (no edit, no deselect).
+    // Clicking a different chip replaces the prior selection.
+    var alreadySelected = state.selectedFrictions.length > 0 && state.selectedFrictions[0].id === id;
+    if (alreadySelected) return;
+    var fr = CONTENT.frictions[state.mode].find(function(e){ return e.id === id; });
+    if (!fr) return;
+    // v2.2: capture chip_text (menu/edit display), reflection_text (rendered in S3 wrapper),
+    // and template (T2 or T3). Edits to text override both display and reflection paths.
+    state.selectedFrictions = [{
+      id: fr.id,
+      text: fr.chip_text,
+      reflection_text: fr.reflection_text,
+      template: fr.template
+    }];
+    state.primaryFriction = fr.id;
+    state.frictionEditText = null;
+    saveState();
+    renderFrictionGrid();
+    updateS2Cta();
   }
 
-  function enterFrictionEditState(id, btnEl) {
-    var sel = state.selectedFrictions.find(function(s){ return s.id === id; });
-    if (!sel) return;
-    var wordEl = btnEl.querySelector('.chip-word');
-    if (!wordEl) return;
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'chip-word-input';
-    input.value = sel.text;
-    input.setAttribute('aria-label', 'Edit friction clause');
-    wordEl.replaceWith(input);
-    input.focus();
-    input.select();
-    var commit = function() {
-      var v = (input.value || '').trim();
-      if (v) {
-        sel.text = v;
-        // v2.2: edited chip text replaces reflection_text too — no auto-pronoun-flip on user edits.
-        // User owns their edit; T2/T3 wrapper still applies based on original template field.
-        sel.reflection_text = v;
-      } else {
-        state.selectedFrictions = state.selectedFrictions.filter(function(s){ return s.id !== id; });
-      }
-      saveState();
-      renderFrictionGrid();
-      updateS2Cta();
-    };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-      else if (e.key === 'Escape') {
-        input.removeEventListener('blur', commit);
-        renderFrictionGrid();
-      }
-      e.stopPropagation();
-    });
-  }
+  // v2.2.1: enterFrictionEditState removed — single-select + no inline edit.
+  // Click on selected chip is now a no-op (see handleFrictionChipClick).
 
   function updateS2Cta() {
     var cta = document.getElementById('s2-cta');
