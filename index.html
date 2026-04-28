@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="vt-version" content="vt-v2-1">
+<meta name="vt-version" content="vt-v2-2">
 <title>Validation Tool — Veris Coaching</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -279,7 +279,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 }
 
 /* ============================================================
-   Screen 1 — Teach (v2.1: numbered list → diagram → rule → paragraphs)
+   Screen 1 — Teach (v2.2: list → bodyP3 → diagram → bodyP4)
    ============================================================ */
 .s1-hero { margin-bottom: 56px; text-align: center; }
 .s1-hero .screen-title { margin-bottom: 20px; }
@@ -312,33 +312,29 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   font-weight: 600;
 }
 
-/* Gordon diagram (now sits mid-page, between numbered list and hairline rule) */
+/* v2.2: Gordon diagram — left-aligned, sits between bodyP3 and bodyP4 */
 .gordon-diagram {
-  margin: 0;
-  text-align: center;
+  margin: 40px 0;
+  text-align: left;
 }
 .gordon-diagram svg {
   display: block;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
   max-width: 680px;
   height: auto;
 }
 .gordon-diagram .diagram-mobile { display: none; max-width: 320px; }
 
-/* v2.1 hairline rule — 80px, ink-ghost @ 35%, centered */
-.s1-rule {
-  border: 0;
-  height: 1px;
-  width: 80px;
-  margin: 64px auto 48px;
-  background: var(--ink-ghost);
-  opacity: 0.35;
-}
+/* v2.2: hairline rule REMOVED. .s1-rule block deleted per Sable spec §3. */
 
 .s1-teaching { margin-bottom: 0; }
 .s1-teaching p { margin-bottom: 18px; }
 .s1-teaching p:last-child { margin-bottom: 0; }
+/* v2.2: pre-diagram body container — listCloser → bodyP3 register break = 40px */
+#s1-body-pre p:first-child { margin-top: 40px; }
+#s1-body-pre p { margin-bottom: 0; }
+#s1-body-post p { margin-bottom: 0; }
 
 .s1-cta-row {
   display: flex;
@@ -353,7 +349,9 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   .s1-numbered li::before { font-size: 16px; }
   .gordon-diagram .diagram-desktop { display: none; }
   .gordon-diagram .diagram-mobile { display: block; }
-  .s1-rule { margin: 48px auto 32px; }
+  /* v2.2 mobile: diagram-flanking gaps compress 40 → 32 */
+  .gordon-diagram { margin: 32px 0; }
+  #s1-body-pre p:first-child { margin-top: 32px; }
   .s1-teaching p { margin-bottom: 16px; }
   .s1-cta-row { margin-top: 40px; }
 }
@@ -783,7 +781,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 </div>
 
 <!-- =============================================================
-     SCREEN 1 — Teach (v2.1: hero → list → diagram → rule → body → CTA)
+     SCREEN 1 — Teach (v2.2: hero → list → bodyP3 → diagram → bodyP4 → CTA)
      ============================================================= -->
 <section class="screen" id="screen1" aria-labelledby="s1-title">
   <div class="column">
@@ -796,7 +794,10 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     <!-- v2.1: Marlowe's three-step numbered list -->
     <ol class="s1-numbered" id="s1-numbered"></ol>
 
-    <!-- v2.1: Gordon diagram MOVED here (between list and rule) -->
+    <!-- v2.2: pre-diagram body paragraph (bodyP3 = Gordon explanation) -->
+    <div class="s1-teaching body" id="s1-body-pre"></div>
+
+    <!-- v2.2: Gordon diagram interposes between bodyP3 and bodyP4 -->
     <figure class="gordon-diagram" id="gordon-diagram">
 
       <svg class="diagram-desktop" viewBox="0 0 680 220" role="img"
@@ -869,11 +870,8 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 
     </figure>
 
-    <!-- v2.1: hairline rule, 80px, ink-ghost @ 35%, centered -->
-    <hr class="s1-rule" aria-hidden="true">
-
-    <!-- v2.1: body paragraphs (Gordon explanation merged from retired figcaption) -->
-    <div class="s1-teaching body" id="s1-body"></div>
+    <!-- v2.2: post-diagram body paragraph (bodyP4 = "this tool walks you through one validation") -->
+    <div class="s1-teaching body" id="s1-body-post"></div>
 
     <div class="s1-cta-row">
       <button class="btn-primary" id="s1-cta" type="button">Begin</button>
@@ -1036,61 +1034,81 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   'use strict';
 
   // ==========================================================
-  // CONTENT (Marlowe v2.1 patch 2026-04-27)
+  // CONTENT (v2.2 locked-decisions patch 2026-04-27)
   // ==========================================================
   var CONTENT = {
+    // v2.2: emotions carry literal primary_render + forward_render strings.
+    // No template substitution at runtime. Emotion 2 ("Too much") has custom primary
+    // that does NOT match the standard "I hear you're feeling X" pattern.
     emotions: [
-      { id: 'unseen',       word: 'Unseen',       desc: "Like their effort or their presence isn't being counted" },
-      { id: 'too-much',     word: 'Too much',     desc: 'Like their pace or their intensity is being treated as a problem' },
-      { id: 'managed',      word: 'Managed',      desc: "Like they're being handled or corrected instead of met" },
-      { id: 'alone',        word: 'Alone',        desc: "Like they're in the room but not in the relationship" },
-      { id: 'exhausted',    word: 'Exhausted',    desc: 'Like showing up has run them out' },
-      { id: 'not-enough',   word: 'Not enough',   desc: "Like something they're bringing isn't landing" },
-      { id: 'trapped',      word: 'Trapped',      desc: 'Like they have less room than they need to be themselves' },
-      { id: 'disrespected', word: 'Disrespected', desc: "Like they're not being taken seriously" }
+      { id: 'overlooked',   word: 'Overlooked',   desc: "Like their effort or their presence isn't being counted",
+        primary_render: "I hear you're feeling overlooked.",
+        forward_render: "What would make you feel less overlooked and more valued?" },
+      { id: 'too-much',     word: 'Too much',     desc: 'Like their pace or their intensity is being treated as a problem',
+        primary_render: "You're worried you're taking up too much space.",
+        forward_render: "What would make you feel less like a burden and more like a partner?" },
+      { id: 'managed',      word: 'Managed',      desc: "Like they're being handled or corrected instead of met",
+        primary_render: "I hear you're feeling managed.",
+        forward_render: "What would make you feel less managed and more empowered?" },
+      { id: 'alone',        word: 'Alone',        desc: "Like they're in the room but not in the relationship",
+        primary_render: "I hear you're feeling alone.",
+        forward_render: "What would make you feel less alone and more connected?" },
+      { id: 'exhausted',    word: 'Exhausted',    desc: 'Like showing up has run them out',
+        primary_render: "I hear you're feeling exhausted.",
+        forward_render: "What would make you feel less exhausted and more supported and energized?" },
+      { id: 'inadequate',   word: 'Inadequate',   desc: "Like something they're bringing isn't landing",
+        primary_render: "I hear you're feeling inadequate.",
+        forward_render: "What would make you feel less inadequate and more capable?" },
+      { id: 'trapped',      word: 'Trapped',      desc: 'Like they have less room than they need to be themselves',
+        primary_render: "I hear you're feeling trapped.",
+        forward_render: "What would make you feel less trapped and more open and free?" },
+      { id: 'disrespected', word: 'Disrespected', desc: "Like they're not being taken seriously",
+        primary_render: "I hear you're feeling disrespected.",
+        forward_render: "What would make you feel less disrespected and more appreciated?" }
     ],
-    // v2.1: positives[] RESTORED — un-retired from v1 per Marlowe Patch 1
-    positives: [
-      { id: 'seen',           word: 'seen' },
-      { id: 'met',            word: 'met' },
-      { id: 'trusted',        word: 'trusted' },
-      { id: 'steady',         word: 'steady' },
-      { id: 'known',          word: 'known' },
-      { id: 'valued',         word: 'valued' },
-      { id: 'on-solid-ground', word: 'on solid ground' },
-      { id: 'at-ease',        word: 'at ease' }
-    ],
-    // v2.1: pairing map per Marlowe table — emotion id → recommended positive id
-    pairings: {
-      'unseen':       'seen',
-      'too-much':     'at-ease',
-      'managed':      'trusted',
-      'alone':        'met',
-      'exhausted':    'steady',
-      'not-enough':   'valued',
-      'trapped':      'on-solid-ground',
-      'disrespected': 'valued'
-    },
+    // v2.2: positives[] and pairings RETIRED per locked-decisions §3 item 6.
+    // Per-emotion paired MORE replaces the free-pick MORE-vocab list. Kept inline
+    // as inert empty arrays/objects for backward-compat on serialized state load.
+    positives: [],
+    pairings: {},
+    // v2.2: frictions carry chip_text (menu, A's voice), reflection_text (rendered, pre-flipped for T3),
+    // and template (T2 or T3) per locked-decisions spec §1.
     frictions: {
       couples: [
-        { id: 'money',        text: 'The same fight about money or how we spend' },
-        { id: 'time',         text: 'The same fight about time — who gets it, who gives it, who wants more' },
-        { id: 'attention',    text: 'The same fight about attention — feeling ignored or feeling smothered' },
-        { id: 'respect',      text: 'The same fight about respect — feeling condescended to or taken for granted' },
-        { id: 'decisions',    text: 'The same fight about who decides — feeling steamrolled or feeling stalled' },
-        { id: 'fairness',     text: 'The same fight about fairness — who does more, who notices what' },
-        { id: 'communication',text: 'The same fight about how we talk — one of us goes hot, one of us goes silent' },
-        { id: 'outside',      text: 'The same fight about people outside us — family, friends, exes, coworkers' }
+        { id: 'money',         template: 'T2', chip_text: "We can't get on the same page about money no matter how hard we try",
+          reflection_text: "We can't get on the same page about money no matter how hard we try" },
+        { id: 'time',          template: 'T2', chip_text: "I want more time with you and it's not happening how I thought it would",
+          reflection_text: "I want more time with you and it's not happening how I thought it would" },
+        { id: 'attention',     template: 'T2', chip_text: "I'm either getting attention I didn't ask for or none at all, and neither feels right",
+          reflection_text: "I'm either getting attention I didn't ask for or none at all, and neither feels right" },
+        { id: 'respect',       template: 'T3', chip_text: "You don't understand the impact of how you talk",
+          reflection_text: "I don't understand the impact of how I talk" },
+        { id: 'decisions',     template: 'T2', chip_text: "Decisions keep happening TO me instead of WITH me",
+          reflection_text: "Decisions keep happening TO me instead of WITH me" },
+        { id: 'fairness',      template: 'T2', chip_text: "I'm carrying more of this than you realize",
+          reflection_text: "I'm carrying more of this than you realize" },
+        { id: 'communication', template: 'T2', chip_text: "When this comes up, one of us escalates and one of us shuts down — and we both lose",
+          reflection_text: "When this comes up, one of us escalates and one of us shuts down — and we both lose" },
+        { id: 'outside',       template: 'T3', chip_text: "I'm uncomfortable with the relationship you have with this other person",
+          reflection_text: "you're uncomfortable with the relationship I have with this other person" }
       ],
       business: [
-        { id: 'money',        text: 'The same disagreement about money — spend, compensation, or how resources get allocated' },
-        { id: 'time',         text: "The same disagreement about time — who's carrying the clock, who's out of runway" },
-        { id: 'attention',    text: 'The same disagreement about attention — feeling overlooked or feeling micromanaged' },
-        { id: 'respect',      text: 'The same disagreement about respect — feeling talked down to or feeling taken for granted' },
-        { id: 'decisions',    text: 'The same disagreement about who decides — feeling steamrolled or feeling stalled' },
-        { id: 'fairness',     text: "The same disagreement about workload — who's carrying what, and who's seeing it" },
-        { id: 'communication',text: 'The same disagreement about how we talk — one of us escalates, one of us disengages' },
-        { id: 'outside',      text: 'The same disagreement about outside parties — team members, board, clients, investors' }
+        { id: 'money',         template: 'T2', chip_text: "Money decisions keep happening without enough feedback",
+          reflection_text: "Money decisions keep happening without enough feedback" },
+        { id: 'time',          template: 'T2', chip_text: "I'm carrying the timeline pressure on this and I want that to be taken into account",
+          reflection_text: "I'm carrying the timeline pressure on this and I want that to be taken into account" },
+        { id: 'attention',     template: 'T3', chip_text: "You're either looking over my shoulder or checked out with nothing in between",
+          reflection_text: "I'm either looking over your shoulder or checked out with nothing in between" },
+        { id: 'respect',       template: 'T2', chip_text: "The way decisions get explained to me feels like condescension rather than partnership",
+          reflection_text: "The way decisions get explained to me feels like condescension rather than partnership" },
+        { id: 'decisions',     template: 'T2', chip_text: "Decisions get made without me when I thought I'd be included",
+          reflection_text: "Decisions get made without me when I thought I'd be included" },
+        { id: 'fairness',      template: 'T2', chip_text: "The operational load isn't split the way I thought, and I'm out of capacity",
+          reflection_text: "The operational load isn't split the way I thought, and I'm out of capacity" },
+        { id: 'communication', template: 'T2', chip_text: 'When this gets hard, one of us does "fight," while the other does "flight"',
+          reflection_text: 'When this gets hard, one of us does "fight," while the other does "flight"' },
+        { id: 'outside',       template: 'T2', chip_text: "Another stakeholder is having more influence over this than I'd like",
+          reflection_text: "Another stakeholder is having more influence over this than I'd like" }
       ]
     },
     copy: {
@@ -1158,8 +1176,10 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   // ==========================================================
   // STATE
   // ==========================================================
-  // v2.1 key bump — adds primaryMore + moreEditText fields. v2 state quarantined.
-  var STORAGE_KEY = 'validation-tool-state-v2-1';
+  // v2.2 key bump — emotion ids changed (unseen→overlooked, not-enough→inadequate),
+  // friction shape changed (chip_text/reflection_text/template), MORE-slot retired.
+  // v2.1 state shape is incompatible — bump key to quarantine stale state.
+  var STORAGE_KEY = 'validation-tool-state-v2-2';
   var state = loadState() || {
     mode: readModeFromQuery(),
     screen: 1,
@@ -1167,9 +1187,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     selectedFrictions: [],
     primaryEmotion: null,
     primaryFriction: null,
-    primaryMore: null,        // v2.1 — id from positives[]
-    frictionEditText: null,
-    moreEditText: null        // v2.1 — user-edited override for MORE slot
+    frictionEditText: null
   };
 
   // v2.1: mode default FLIPPED to business. ?mode=couples → couples. ?mode=business or no-param → business.
@@ -1192,9 +1210,6 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       var urlMode = readModeFromQuery();
       // URL mode takes precedence on load (matches v2 behavior)
       if (urlMode && urlMode !== s.mode) s.mode = urlMode;
-      // Defensive defaults for any v2.1 fields missing in older serialized state
-      if (typeof s.primaryMore === 'undefined') s.primaryMore = null;
-      if (typeof s.moreEditText === 'undefined') s.moreEditText = null;
       return s;
     } catch (e) { return null; }
   }
@@ -1219,14 +1234,18 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     // v2.1: numbered list — intro + 3 items + closer rendered into <ol> + adjacent paragraphs
     renderS1Numbered();
 
-    // v2.1: body paragraphs after the diagram + rule
-    var bodyEl = document.getElementById('s1-body');
-    bodyEl.innerHTML = '';
-    [c.s1.bodyP3, c.s1.bodyP4].forEach(function(p) {
-      var el = document.createElement('p');
-      el.textContent = p;
-      bodyEl.appendChild(el);
-    });
+    // v2.2: body paragraphs split into pre-diagram (bodyP3) and post-diagram (bodyP4) containers
+    var preEl = document.getElementById('s1-body-pre');
+    preEl.innerHTML = '';
+    var p3 = document.createElement('p');
+    p3.textContent = c.s1.bodyP3;
+    preEl.appendChild(p3);
+
+    var postEl = document.getElementById('s1-body-post');
+    postEl.innerHTML = '';
+    var p4 = document.createElement('p');
+    p4.textContent = c.s1.bodyP4;
+    postEl.appendChild(p4);
     document.getElementById('s1-footnote').textContent = CONTENT.footnotes[m];
 
     document.getElementById('s2-title').textContent = c.s2.title;
@@ -1245,7 +1264,11 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 
     document.getElementById('s4-title').textContent = c.s4.title;
     document.getElementById('s4-anchor').textContent = c.s4.anchor;
-    document.getElementById('s4-alternate').textContent = c.s4.alternate;
+    // v2.2: s4-alternate hidden — Marlowe's "Or sharper" line was paired with the v2.1 templated
+    // forward question. v2.2 forward question is per-emotion literal, so the alternate is moot.
+    var s4Alt = document.getElementById('s4-alternate');
+    s4Alt.textContent = '';
+    s4Alt.style.display = 'none';
     document.getElementById('s4-instruction').textContent =
       m === 'business' ? c.s4.instrBusiness : c.s4.instrCouples;
     document.getElementById('s4-dont-weaponize').textContent = c.s4.dontWeaponize;
@@ -1293,7 +1316,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     // after the hero header. That keeps Sable's stack: hero → list-intro+ol+list-closer → diagram.
     var p1 = document.createElement('p');
     p1.className = 'body s1-bodyP1';
-    p1.style.marginBottom = '24px';
+    p1.style.marginBottom = '18px';
     p1.textContent = c.bodyP1;
     ol.parentNode.insertBefore(p1, ol);
 
@@ -1469,7 +1492,8 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
       var text = document.createElement('span');
       text.className = 'chip-word card-title';
       text.style.whiteSpace = 'normal';
-      text.textContent = selected ? selected.text : fr.text;
+      // v2.2: render chip_text (Person A's voice) in the menu. selected.text holds user-edited override.
+      text.textContent = selected ? selected.text : fr.chip_text;
 
       btn.appendChild(text);
       btn.addEventListener('click', function() {
@@ -1484,7 +1508,14 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     var existing = state.selectedFrictions.find(function(s){ return s.id === id; });
     if (!existing) {
       var fr = CONTENT.frictions[state.mode].find(function(e){ return e.id === id; });
-      state.selectedFrictions.push({ id: fr.id, text: fr.text });
+      // v2.2: capture chip_text (menu/edit display), reflection_text (rendered in S3 wrapper),
+      // and template (T2 or T3). Edits to text override both display and reflection paths.
+      state.selectedFrictions.push({
+        id: fr.id,
+        text: fr.chip_text,
+        reflection_text: fr.reflection_text,
+        template: fr.template
+      });
       saveState();
       renderFrictionGrid();
       updateS2Cta();
@@ -1508,8 +1539,14 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     input.select();
     var commit = function() {
       var v = (input.value || '').trim();
-      if (v) sel.text = v;
-      else state.selectedFrictions = state.selectedFrictions.filter(function(s){ return s.id !== id; });
+      if (v) {
+        sel.text = v;
+        // v2.2: edited chip text replaces reflection_text too — no auto-pronoun-flip on user edits.
+        // User owns their edit; T2/T3 wrapper still applies based on original template field.
+        sel.reflection_text = v;
+      } else {
+        state.selectedFrictions = state.selectedFrictions.filter(function(s){ return s.id !== id; });
+      }
       saveState();
       renderFrictionGrid();
       updateS2Cta();
@@ -1532,7 +1569,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   // ==========================================================
-  // SCREEN 3 — Frame (three-line composer) (UNCHANGED from v2)
+  // SCREEN 3 — Frame (v2.2: per-chip T2/T3 wrapper, emotion primary dropped per §3.7 option a)
   // ==========================================================
   function renderScreen3() {
     if (!state.primaryEmotion ||
@@ -1545,24 +1582,41 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     }
     saveState();
 
+    // v2.2: line 1 (emotion primary) is hidden — option (a) per locked-decisions §3 item 7.
+    // The chip-text reflection alone carries the validation; emotion primary moves to S4.
     var line1 = document.getElementById('s3-line-emotion');
     line1.innerHTML = '';
-    appendText(line1, '“I hear you’re feeling ');
-    line1.appendChild(buildEmotionSlot('s3'));
-    appendText(line1, '.');
+    line1.style.display = 'none';
 
+    // v2.2: friction reflection rendered via per-chip T2 or T3 wrapper.
+    // T2: "You're saying, '${reflection_text},' Did I get that right?"
+    // T3: "You're saying that ${reflection_text}, did I get that right?"
     var line2 = document.getElementById('s3-line-situation');
     line2.innerHTML = '';
-    appendText(line2, 'From your side, ');
-    line2.appendChild(buildFrictionSlot('s3'));
-    appendText(line2, '.');
+    var template = getPrimaryFrictionTemplate();
+    if (template === 'T3') {
+      appendText(line2, "You're saying that ");
+      line2.appendChild(buildFrictionSlot('s3'));
+      appendText(line2, ', did I get that right?');
+    } else {
+      // T2 (default)
+      appendText(line2, "You're saying, '");
+      line2.appendChild(buildFrictionSlot('s3'));
+      appendText(line2, ",' Did I get that right?");
+    }
 
-    var emoWord = getPrimaryEmotionWord();
-    var fricText = getPrimaryFrictionText();
-    document.getElementById('s3-alt-simple').textContent =
-      '“I hear you’re feeling ' + emoWord + '. Did I get that right?”';
-    document.getElementById('s3-alt-tentative').textContent =
-      '“It sounds like, from your side, ' + fricText + ' — and you might be feeling ' + emoWord + '. Is that close?”';
+    // v2.2: line 3 (the standalone "Did I get that right?" closing) is now embedded
+    // in the T2/T3 wrapper above. Hide the separate closing line.
+    var line3 = document.getElementById('s3-line-checkin');
+    if (line3) line3.style.display = 'none';
+
+    // v2.2: alternates block dropped — chip-text reflection IS the sentence.
+    // Alternates were noun-clause hedging built for v2.1's compressed friction format;
+    // v2.2 chip texts are full sentences in Person A's voice, so hedging would break grammar.
+    var alts = document.getElementById('s3-alternates');
+    if (alts) alts.style.display = 'none';
+    var sep = document.querySelector('#screen3 .composer-separator');
+    if (sep) sep.style.display = 'none';
   }
 
   function appendText(parent, str) {
@@ -1573,33 +1627,36 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     var sel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
     return sel ? sel.word.toLowerCase() : '___';
   }
+  // v2.2: friction text rendered in S3 wrapper = reflection_text (pre-flipped for T3 chips),
+  // unless the user has applied an inline edit on S3, which overrides display.
   function getPrimaryFrictionText() {
     if (state.frictionEditText != null) return state.frictionEditText;
     var sel = state.selectedFrictions.find(function(f){ return f.id === state.primaryFriction; });
-    return sel ? sel.text : '___';
+    if (!sel) return '___';
+    // Prefer reflection_text if present (v2.2 data shape). Fallback to text (user-edited from S2).
+    return (sel.reflection_text != null) ? sel.reflection_text : (sel.text || '___');
+  }
+  function getPrimaryFrictionTemplate() {
+    var sel = state.selectedFrictions.find(function(f){ return f.id === state.primaryFriction; });
+    return (sel && sel.template) ? sel.template : 'T2';
+  }
+  // v2.2: forward question is per-emotion literal string (no template substitution).
+  function getPrimaryEmotionForward() {
+    var sel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
+    if (!sel) return '___';
+    var emo = CONTENT.emotions.find(function(e){ return e.id === sel.id; });
+    return emo ? emo.forward_render : '___';
+  }
+  // v2.2: emotion primary render is per-emotion literal string.
+  function getPrimaryEmotionRender() {
+    var sel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
+    if (!sel) return '___';
+    var emo = CONTENT.emotions.find(function(e){ return e.id === sel.id; });
+    return emo ? emo.primary_render : '___';
   }
 
-  // v2.1: MORE slot value resolution.
-  // Priority: user edit override → primaryMore from state → smart default from pairings table → first positive.
-  function getPrimaryMoreWord() {
-    if (state.moreEditText != null) {
-      return state.moreEditText;
-    }
-    if (state.primaryMore) {
-      var p = CONTENT.positives.find(function(x){ return x.id === state.primaryMore; });
-      if (p) return p.word;
-    }
-    // Smart default from pairings table based on current emotion
-    var emoSel = state.selectedEmotions.find(function(e){ return e.id === state.primaryEmotion; });
-    if (emoSel) {
-      var pairId = CONTENT.pairings[emoSel.id];
-      if (pairId) {
-        var paired = CONTENT.positives.find(function(x){ return x.id === pairId; });
-        if (paired) return paired.word;
-      }
-    }
-    return CONTENT.positives[0].word;
-  }
+  // v2.2: MORE slot RETIRED. Forward question per-emotion literal renders the paired MORE
+  // word (or compound) as part of forward_render — no runtime substitution. See getPrimaryEmotionForward().
 
   function buildEmotionSlot(screen) {
     var wrap = document.createElement('span');
@@ -1681,65 +1738,20 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     else renderScreen3();
   }
 
-  // v2.1: MORE slot — cycle through 8-word vocabulary (always available — no multi-select gating).
-  function buildMoreSlot() {
-    var wrap = document.createElement('span');
-    wrap.className = 'slot';
-    wrap.setAttribute('role', 'button');
-    wrap.setAttribute('tabindex', '0');
-    wrap.setAttribute('aria-label', 'Choose or edit the more-word');
-    var text = document.createElement('span');
-    text.textContent = getPrimaryMoreWord();
-    wrap.appendChild(text);
-
-    var picker = document.createElement('button');
-    picker.type = 'button';
-    picker.className = 'slot-picker-btn';
-    picker.setAttribute('aria-label', 'Switch more-word');
-    picker.textContent = '▾';
-    picker.addEventListener('click', function(e) {
-      e.stopPropagation();
-      cycleMore();
-    });
-    wrap.appendChild(picker);
-
-    wrap.addEventListener('click', function() { enterSlotEdit(wrap, 'more', 's4'); });
-    wrap.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterSlotEdit(wrap, 'more', 's4'); }
-    });
-    return wrap;
-  }
-
-  function cycleMore() {
-    // If primaryMore not yet set, seed from current visible word (smart default)
-    if (!state.primaryMore) {
-      var current = getPrimaryMoreWord();
-      var match = CONTENT.positives.find(function(p){ return p.word === current; });
-      state.primaryMore = match ? match.id : CONTENT.positives[0].id;
-    }
-    var idx = CONTENT.positives.findIndex(function(p){ return p.id === state.primaryMore; });
-    var next = (idx + 1) % CONTENT.positives.length;
-    state.primaryMore = CONTENT.positives[next].id;
-    state.moreEditText = null;
-    saveState();
-    renderScreen4();
-  }
+  // v2.2: buildMoreSlot / cycleMore RETIRED. Forward question is a literal per-emotion string.
 
   function enterSlotEdit(wrapEl, kind, screen) {
     if (wrapEl.querySelector('input.slot-input')) return;
     var current;
     if (kind === 'emotion') current = getPrimaryEmotionWord();
     else if (kind === 'friction') current = getPrimaryFrictionText();
-    else if (kind === 'more') current = getPrimaryMoreWord();
     wrapEl.innerHTML = '';
     var input = document.createElement('input');
     input.type = 'text';
     input.className = 'slot-input';
     input.value = current;
     input.setAttribute('aria-label',
-      kind === 'emotion' ? 'Edit emotion'
-      : kind === 'friction' ? 'Edit friction'
-      : 'Edit more-word');
+      kind === 'emotion' ? 'Edit emotion' : 'Edit friction');
     wrapEl.appendChild(input);
     input.style.width = Math.max(80, Math.min(600, current.length * 12)) + 'px';
     input.focus();
@@ -1757,8 +1769,6 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
         if (sel && v) sel.word = v;
       } else if (kind === 'friction') {
         if (v) state.frictionEditText = v;
-      } else if (kind === 'more') {
-        if (v) state.moreEditText = v;
       }
       saveState();
       rerender();
@@ -1778,7 +1788,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
   }
 
   // ==========================================================
-  // SCREEN 4 — Prompt (v2.1: dynamic two-slot forward question)
+  // SCREEN 4 — Prompt (v2.2: per-emotion literal forward render, no template substitution)
   // ==========================================================
   function renderScreen4() {
     // Ensure primaryEmotion exists (mirror s3 fallback)
@@ -1788,23 +1798,24 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     }
     saveState();
 
+    // v2.2: forward question is rendered verbatim per-emotion. No editable slots —
+    // the MORE word is pre-paired into the literal string (e.g. "supported and energized").
     var q = document.getElementById('s4-question');
     q.innerHTML = '';
-    // Build: “What would make you feel less [LESS] and more [MORE]?”
-    appendText(q, '“What would make you feel less ');
-    q.appendChild(buildEmotionSlot('s4'));
-    appendText(q, ' and more ');
-    q.appendChild(buildMoreSlot());
-    appendText(q, '?”');
+    appendText(q, '“' + getPrimaryEmotionForward() + '”');
+
+    // v2.2: option (a) per locked-decisions §3.7 — emotion primary line is omitted
+    // from the reflection flow entirely. The chip-text reflection on S3 carries the
+    // validation; the forward question on S4 carries the next step. No redundant
+    // "I hear you're feeling X" anywhere.
   }
 
   // ==========================================================
-  // PRINT CARD RENDER (pre-print hook)
+  // PRINT CARD RENDER (v2.2: T2/T3 wrapper, alternates dropped, literal forward render)
   // ==========================================================
   function renderPrintCard() {
-    var emoWord = getPrimaryEmotionWord();
     var fricText = getPrimaryFrictionText();
-    var moreWord = getPrimaryMoreWord();
+    var template = getPrimaryFrictionTemplate();
     var today = new Date();
     var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var dateStr = 'Rehearsed ' + months[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear() + '.';
@@ -1812,17 +1823,30 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
     document.getElementById('pc-anchor').textContent =
       state.mode === 'business' ? CONTENT.copy.pocketCard.anchorBusiness : CONTENT.copy.pocketCard.anchorCouples;
 
-    document.getElementById('pc-line-emotion').textContent = '“I hear you’re feeling ' + emoWord + '.';
-    document.getElementById('pc-line-situation').textContent = 'From your side, ' + fricText + '.';
+    // v2.2: emotion primary line dropped (option a). Hide the slot; render full T2/T3 wrapper
+    // as the situation line so the chip-text reflection carries the whole validation.
+    document.getElementById('pc-line-emotion').style.display = 'none';
+    var checkin = document.querySelector('#print-card .pc-checkin');
+    if (checkin) checkin.style.display = 'none';
 
-    document.getElementById('pc-alt-simple').textContent =
-      '“I hear you’re feeling ' + emoWord + '. Did I get that right?”';
-    document.getElementById('pc-alt-tentative').textContent =
-      '“It sounds like, from your side, ' + fricText + ' — and you might be feeling ' + emoWord + '. Is that close?”';
+    var fullReflection;
+    if (template === 'T3') {
+      fullReflection = "“You’re saying that " + fricText + ", did I get that right?”";
+    } else {
+      fullReflection = "“You’re saying, ‘" + fricText + ",’ Did I get that right?”";
+    }
+    document.getElementById('pc-line-situation').textContent = fullReflection;
 
-    // v2.1: pocket card forward question — dynamic two-slot per Marlowe Patch 1
-    document.getElementById('pc-question').textContent =
-      '“What would make you feel less ' + emoWord + ' and more ' + moreWord + '?”';
+    // v2.2: alternates dropped — chip-text reflection IS the sentence. Hide alt slots + labels.
+    var altSimple = document.getElementById('pc-alt-simple');
+    var altTent = document.getElementById('pc-alt-tentative');
+    if (altSimple) altSimple.style.display = 'none';
+    if (altTent) altTent.style.display = 'none';
+    var altLabels = document.querySelectorAll('#print-card .pc-alt-label');
+    altLabels.forEach(function(el){ el.style.display = 'none'; });
+
+    // v2.2: forward question = literal per-emotion render
+    document.getElementById('pc-question').textContent = '“' + getPrimaryEmotionForward() + '”';
 
     document.getElementById('pc-footnote').textContent = CONTENT.footnotes[state.mode];
     document.getElementById('pc-url').textContent = 'scottmcbean.github.io/validation-tool';
@@ -1890,9 +1914,7 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
         selectedFrictions: [],
         primaryEmotion: null,
         primaryFriction: null,
-        primaryMore: null,
-        frictionEditText: null,
-        moreEditText: null
+        frictionEditText: null
       };
       saveState();
       applyCopyForMode();
